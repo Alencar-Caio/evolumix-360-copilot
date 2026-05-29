@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { notifyOwner } from "./notification";
 import { adminProcedure, publicProcedure, router } from "./trpc";
+import { getDb } from "../db";
+import { auditLogs } from "../../drizzle/schema";
+import { desc } from "drizzle-orm";
 
 export const systemRouter = router({
   health: publicProcedure
@@ -25,5 +28,26 @@ export const systemRouter = router({
       return {
         success: delivered,
       } as const;
+    }),
+
+  auditLogs: adminProcedure
+    .input(
+      z.object({
+        limit: z.number().default(100),
+        offset: z.number().default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      const logs = await db
+        .select()
+        .from(auditLogs)
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      return logs;
     }),
 });

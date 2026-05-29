@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, queries, auditLogs, documents, documentVersions, approvals, diagnostics, roiCalculations } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,66 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Helpers para documentos
+export async function getApprovedDocuments() {
+  const db = await getDb();
+  if (!db) return [];
+  // Retorna documentos com status 'approved'
+  return db.select().from(documents).where(eq(documents.status, 'approved'));
+}
+
+// Helpers para consultas
+export async function createQuery(data: {
+  userId: number;
+  queryText: string;
+  responseText?: string;
+  usedDocumentIds?: number[];
+  citations?: any[];
+  faithfulnessScore?: number;
+  citationCoverageScore?: number;
+  riskClassification: 'low' | 'medium' | 'high' | 'critical';
+  requiresApproval: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(queries).values({
+    userId: data.userId,
+    queryText: data.queryText,
+    responseText: data.responseText || null,
+    usedDocumentIds: data.usedDocumentIds ? JSON.stringify(data.usedDocumentIds) : null,
+    citations: data.citations ? JSON.stringify(data.citations) : null,
+    faithfulnessScore: data.faithfulnessScore ? String(data.faithfulnessScore) : null,
+    citationCoverageScore: data.citationCoverageScore ? String(data.citationCoverageScore) : null,
+    riskClassification: data.riskClassification,
+    requiresApproval: data.requiresApproval,
+  } as any);
+  
+  return result;
+}
+
+// Helpers para auditoria
+export async function logAudit(data: {
+  userId: number;
+  action: string;
+  entityType?: string;
+  entityId?: number;
+  details?: any;
+  ipAddress?: string;
+  userAgent?: string;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.insert(auditLogs).values({
+    userId: data.userId,
+    action: data.action,
+    entityType: data.entityType,
+    entityId: data.entityId,
+    details: data.details ? JSON.stringify(data.details) : null,
+    ipAddress: data.ipAddress,
+    userAgent: data.userAgent,
+  });
+}
+
+// TODO: add more feature queries as your schema grows
