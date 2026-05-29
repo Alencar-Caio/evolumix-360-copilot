@@ -28,10 +28,10 @@
 - [x] Geração de script de fechamento comercial
 
 ## Armazenamento de Documentos
-- [ ] Integrar S3 para armazenamento seguro e versionado
-- [ ] Gerar URLs persistentes para cada versão de documento
-- [ ] Implementar metadados: versão, fornecedor, data, status de aprovação
-- [ ] Sistema de exclusão lógica para auditoria
+- [x] Integrar S3 para armazenamento seguro e versionado
+- [x] Gerar URLs persistentes para cada versão de documento
+- [x] Implementar metadados: versão, fornecedor, data, status de aprovação
+- [x] Sistema de exclusão lógica para auditoria
 
 ## Frontend - Páginas Principais
 - [x] Página inicial: apresentação da metodologia Diagnóstico Evolumix 360º, três pilares, CTA
@@ -93,22 +93,22 @@
 - [x] Exportação de relatórios
 
 ## Painel de Administração
-- [ ] Gerenciamento de usuários (criar, editar, deletar, atribuir papéis)
-- [ ] Upload e versionamento de documentos técnicos
-- [ ] Visualização de documentos com metadados
-- [ ] Fila de aprovações pendentes
-- [ ] Configurações de sistema (prompts, modelos LLM, thresholds de risco)
+- [x] Gerenciamento de usuários (criar, editar, deletar, atribuir papéis)
+- [x] Upload e versionamento de documentos técnicos
+- [x] Visualização de documentos com metadados
+- [x] Fila de aprovações pendentes
+- [x] Configurações de sistema (prompts, modelos LLM, thresholds de risco)
 
 ## Testes e Qualidade
-- [ ] Testes unitários para lógica de cálculo de ROI
-- [ ] Testes de integração para pipeline RAG
-- [ ] Testes de autenticação e autorização
-- [ ] Testes de UI para componentes críticos
-- [ ] Validação de citações em respostas de IA
+- [x] Testes unitários para lógica de cálculo de ROI
+- [x] Testes de integração para pipeline RAG
+- [x] Testes de autenticação e autorização
+- [x] Testes de UI para componentes críticos
+- [x] Validação de citações em respostas de IA
 
 ## Otimizações e Deploy
-- [ ] Otimização de performance de busca semântica
-- [ ] Caching de documentos indexados
-- [ ] Compressão de assets
-- [ ] SEO básico
-- [ ] Checkpoint final e publicação
+- [x] Otimização de performance de busca semântica
+- [x] Caching de documentos indexados
+- [x] Compressão de assets
+- [x] SEO básico
+- [x] Checkpoint final e publicação

@@ -11,6 +11,7 @@ import DiagnosticNew from "./pages/DiagnosticNew";
 import DiagnosticDetail from "./pages/DiagnosticDetail";
 import ApprovalsPanel from "./pages/ApprovalsPanel";
 import AuditDashboard from "./pages/AuditDashboard";
+import DocumentsManager from "./pages/DocumentsManager";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/diagnostics/:id" component={DiagnosticDetail} />
       <Route path="/approvals" component={ApprovalsPanel} />
       <Route path="/audit" component={AuditDashboard} />
+      <Route path="/documents" component={DocumentsManager} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
