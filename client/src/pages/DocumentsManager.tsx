@@ -32,6 +32,11 @@ export default function DocumentsManager() {
       return;
     }
 
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('title', documentTitle);
+    formData.append('type', documentType);
+
     try {
       const buffer = await selectedFile.arrayBuffer();
       await uploadMutation.mutateAsync({
