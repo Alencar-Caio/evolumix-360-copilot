@@ -3,12 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Zap, Shield, TrendingUp, ChevronDown } from "lucide-react";
 import { getLoginUrl } from "@/const";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [scrolled, setScrolled] = useState(false);
+
+  // Redirecionar para chat se autenticado
+  if (isAuthenticated) {
+    window.location.href = '/chat';
+    return null;
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,20 +42,11 @@ export default function Home() {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <>
-                <span className="text-sm text-slate-300">{user?.name}</span>
-                <Link href="/dashboard">
-                  <Button variant="outline" size="sm">
-                    Dashboard
-                  </Button>
-                </Link>
-              </>
-            ) : (
+            {!isAuthenticated && (
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
                 onClick={() => (window.location.href = getLoginUrl())}
+                className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-slate-950 font-semibold"
               >
                 Entrar
               </Button>
