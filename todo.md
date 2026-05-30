@@ -112,3 +112,9 @@
 - [x] Compressão de assets
 - [x] SEO básico
 - [x] Checkpoint final e publicação
+
+## Documentação e Deployment
+- [x] Criar DEPLOYMENT_GUIDE.md com instruções para Railway, Render, Vercel
+- [x] Criar ENV_REFERENCE.md com referência de variáveis de ambiente
+- [x] Gerenciador de documentos com visualização, filtros e arquivamento
+- [x] Testes unitários para todas as rotas
