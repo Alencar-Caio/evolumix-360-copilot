@@ -207,4 +207,41 @@ export const documentsRouter = router({
       
       return { success: true };
     }),
+
+  /**
+   * Arquivar documento (apenas admin)
+   */
+  delete: protectedProcedure
+    .input(z.object({
+      documentId: z.number(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: only admins can delete documents');
+      }
+      
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
+      // Atualizar documento como arquivado
+      await db.update(documents)
+        .set({
+          status: 'archived',
+          updatedAt: new Date(),
+        })
+        .where(eq(documents.id, input.documentId));
+      
+      // Log de auditoria
+      await logAudit({
+        userId: ctx.user.id,
+        action: 'document_archived',
+        entityType: 'document',
+        entityId: input.documentId,
+        details: {},
+        ipAddress: (ctx.req as any).ip,
+        userAgent: (ctx.req as any).headers['user-agent'],
+      });
+      
+      return { success: true };
+    }),
 });

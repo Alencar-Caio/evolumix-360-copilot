@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
-import { Loader2, Upload, FileText, Trash2, Eye, Plus } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Loader2, Upload, FileText, Trash2, Eye, Plus, Download } from "lucide-react";
 import { toast } from "sonner";
 
 export default function DocumentsManager() {
@@ -22,20 +23,34 @@ export default function DocumentsManager() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [documentTitle, setDocumentTitle] = useState('');
   const [documentType, setDocumentType] = useState('FISPQ');
+  const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<any>(null);
 
   const documentsQuery = trpc.documents.listAll.useQuery();
   const uploadMutation = trpc.documents.upload.useMutation();
+  const deleteDocumentMutation = trpc.documents.delete.useMutation();
+
+  // Filtrar documentos baseado nos filtros
+  const filteredDocuments = useMemo(() => {
+    if (!documentsQuery.data) return [];
+    
+    return documentsQuery.data.filter((doc: any) => {
+      const matchesType = filters.type === 'all' || doc.documentType === filters.type;
+      const matchesStatus = filters.status === 'all' || doc.status === filters.status;
+      const matchesSearch = filters.searchTerm === '' || 
+        doc.title.toLowerCase().includes(filters.searchTerm.toLowerCase());
+      
+      return matchesType && matchesStatus && matchesSearch;
+    });
+  }, [documentsQuery.data, filters]);
 
   const handleUpload = async () => {
     if (!selectedFile || !documentTitle) {
       toast.error('Por favor, preencha todos os campos');
       return;
     }
-
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('title', documentTitle);
-    formData.append('type', documentType);
 
     try {
       const buffer = await selectedFile.arrayBuffer();
@@ -53,6 +68,33 @@ export default function DocumentsManager() {
     } catch (error) {
       console.error('Error uploading document:', error);
       toast.error('Erro ao enviar documento. Tente novamente.');
+    }
+  };
+
+  const handleViewDocument = (doc: any) => {
+    setSelectedDocument(doc);
+    setShowViewDialog(true);
+  };
+
+  const handleDeleteClick = (doc: any) => {
+    setDocumentToDelete(doc);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!documentToDelete) return;
+    
+    try {
+      await deleteDocumentMutation.mutateAsync({
+        documentId: documentToDelete.id,
+      });
+      toast.success('Documento arquivado com sucesso!');
+      setShowDeleteDialog(false);
+      setDocumentToDelete(null);
+      documentsQuery.refetch();
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast.error('Erro ao arquivar documento. Tente novamente.');
     }
   };
 
@@ -205,7 +247,13 @@ export default function DocumentsManager() {
             </div>
 
             <div className="flex items-end">
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => {
+                  toast.success('Filtros aplicados!');
+                }}
+              >
                 Aplicar Filtros
               </Button>
             </div>
@@ -220,7 +268,7 @@ export default function DocumentsManager() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
             </div>
-          ) : documentsQuery.data && documentsQuery.data.length > 0 ? (
+          ) : filteredDocuments && filteredDocuments.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -234,7 +282,7 @@ export default function DocumentsManager() {
                   </tr>
                 </thead>
                 <tbody>
-                  {documentsQuery.data.map((doc: any) => (
+                  {filteredDocuments.map((doc: any) => (
                     <tr key={doc.id} className="border-b hover:bg-slate-50 dark:hover:bg-slate-800">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
@@ -278,10 +326,19 @@ export default function DocumentsManager() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex gap-2">
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleViewDocument(doc)}
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-500 hover:text-red-600"
+                            onClick={() => handleDeleteClick(doc)}
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -299,6 +356,121 @@ export default function DocumentsManager() {
           )}
         </Card>
       </div>
+
+      {/* View Document Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Detalhes do Documento</DialogTitle>
+            <DialogDescription>
+              Informações completas e versões do documento
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedDocument && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase">Título</p>
+                  <p className="text-sm font-semibold mt-1">{selectedDocument.title}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase">Tipo</p>
+                  <p className="text-sm font-semibold mt-1">
+                    {selectedDocument.documentType === 'FISPQ'
+                      ? 'FISPQ'
+                      : selectedDocument.documentType === 'technical_sheet'
+                      ? 'Ficha Técnica'
+                      : selectedDocument.documentType === 'catalog'
+                      ? 'Catálogo'
+                      : 'Outro'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase">Status</p>
+                  <Badge className="mt-1">
+                    {selectedDocument.status === 'approved'
+                      ? 'Aprovado'
+                      : selectedDocument.status === 'draft'
+                      ? 'Rascunho'
+                      : 'Arquivado'}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase">Data de Criação</p>
+                  <p className="text-sm font-semibold mt-1">
+                    {new Date(selectedDocument.createdAt).toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+              </div>
+
+              {selectedDocument.description && (
+                <div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase">Descrição</p>
+                  <p className="text-sm mt-1">{selectedDocument.description}</p>
+                </div>
+              )}
+
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase mb-2">Versões</p>
+                <div className="space-y-2">
+                  {selectedDocument.versions && selectedDocument.versions.length > 0 ? (
+                    selectedDocument.versions.map((version: any) => (
+                      <div key={version.id} className="border rounded p-3 flex justify-between items-center">
+                        <div>
+                          <p className="text-sm font-semibold">Versão {version.versionNumber}</p>
+                          <p className="text-xs text-slate-500">
+                            {new Date(version.createdAt).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                        <a
+                          href={version.storageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-cyan-500 hover:text-cyan-600"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">Nenhuma versão disponível</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Arquivar Documento?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja arquivar o documento "{documentToDelete?.title}"? Esta ação pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-4">
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleteDocumentMutation.isPending}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              {deleteDocumentMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Arquivando...
+                </>
+              ) : (
+                'Arquivar'
+              )}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
