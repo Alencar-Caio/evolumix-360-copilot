@@ -39,7 +39,7 @@
 - [x] Página de chat técnico com IA
 - [x] Formulário de Diagnóstico 360º com captura de cenário
 - [x] Calculadora de ROI interativa
-- [ ] Gerenciador de documentos técnicos
+- [x] Gerenciador de documentos técnicos
 - [x] Dashboard de auditoria
 
 ## Frontend - Design Visual
