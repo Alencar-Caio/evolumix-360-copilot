@@ -2,7 +2,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
-import { useAuth } from "@/_core/hooks/useAuth";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -13,39 +12,20 @@ import DiagnosticDetail from "./pages/DiagnosticDetail";
 import ApprovalsPanel from "./pages/ApprovalsPanel";
 import AuditDashboard from "./pages/AuditDashboard";
 import DocumentsManager from "./pages/DocumentsManager";
-import UsersManagement from "./pages/UsersManagement";
-
-function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Home />;
-  }
-
-  return <Component />;
-}
 
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"="} component={Home} />
-      <Route path={"/dashboard"} component={() => <ProtectedRoute component={Dashboard} />} />
-      <Route path={"/copilot"} component={() => <ProtectedRoute component={Copilot} />} />
-      <Route path={"/diagnostics/new"} component={() => <ProtectedRoute component={DiagnosticNew} />} />
-      <Route path={"/diagnostics/:id"} component={() => <ProtectedRoute component={DiagnosticDetail} />} />
-      <Route path={"/approvals"} component={() => <ProtectedRoute component={ApprovalsPanel} />} />
-      <Route path={"/audit"} component={() => <ProtectedRoute component={AuditDashboard} />} />
-      <Route path={"/documents"} component={() => <ProtectedRoute component={DocumentsManager} />} />
-      <Route path={"/users"} component={() => <ProtectedRoute component={UsersManagement} />} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/" component={Home} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/copilot" component={Copilot} />
+      <Route path="/diagnostics/new" component={DiagnosticNew} />
+      <Route path="/diagnostics/:id" component={DiagnosticDetail} />
+      <Route path="/approvals" component={ApprovalsPanel} />
+      <Route path="/audit" component={AuditDashboard} />
+      <Route path="/documents" component={DocumentsManager} />
+      <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
