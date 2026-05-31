@@ -225,8 +225,17 @@
   - [x] Limites por IP/usuário
   - [x] 14 testes passando
 - [ ] Implementar API Rate Limiting (Integração Real)
-- [ ] Adicionar Dependency Scanning (SBOM)
-- [ ] Implementar Zero-Trust Architecture
+- [x] Dependency Scanner (Utilitário) - Completo
+  - [x] SBOM generation
+  - [x] Detecção de vulnerabilidades
+  - [x] Conformidade de licenças
+  - [x] 14 testes passando
+- [x] Zero-Trust Architecture (Utilitário) - Completo
+  - [x] Verificação de identidade
+  - [x] Validação de contexto
+  - [x] Princípio de menor privilégio
+  - [x] Auditoria de acesso
+  - [x] 13 testes passando
 - [ ] Adicionar Incident Response Playbook
 - [ ] Implementar Cost Optimization Dashboard
 - [ ] Adicionar Performance Baseline e Regression Testing
