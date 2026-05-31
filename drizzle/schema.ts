@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, decimal, index } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, decimal, index, bigint } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -237,3 +237,45 @@ export const roiCalculationsRelations = relations(roiCalculations, ({ one }) => 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   user: one(users, { fields: [auditLogs.userId], references: [users.id] }),
 }));
+
+
+/**
+ * Audit Trail Imutável com blockchain-like hashing
+ * Para conformidade SOC 2, GDPR, HIPAA
+ */
+export const immutableAuditLogs = mysqlTable('immutable_audit_logs', {
+  id: bigint('id', { mode: 'bigint' }).primaryKey().autoincrement(),
+  
+  // Conteúdo do evento
+  eventType: varchar('event_type', { length: 50 }).notNull(),
+  entityType: varchar('entity_type', { length: 50 }).notNull(),
+  entityId: varchar('entity_id', { length: 255 }).notNull(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  action: varchar('action', { length: 100 }).notNull(),
+  
+  // Detalhes
+  details: json('details').$type<Record<string, any>>().notNull(),
+  
+  // Segurança
+  ipAddress: varchar('ip_address', { length: 45 }).notNull(),
+  userAgent: text('user_agent'),
+  
+  // Hashing para imutabilidade
+  hash: varchar('hash', { length: 64 }).notNull(),
+  previousHash: varchar('previous_hash', { length: 64 }),
+  
+  // Timestamps
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  
+}, (table) => ({
+  eventTypeIdx: index('idx_immutable_event_type').on(table.eventType),
+  userIdIdx: index('idx_immutable_user_id').on(table.userId),
+  entityIdIdx: index('idx_immutable_entity_id').on(table.entityId),
+  createdAtIdx: index('idx_immutable_created_at').on(table.createdAt),
+  hashIdx: index('idx_immutable_hash').on(table.hash),
+}));
+
+export type ImmutableAuditLog = typeof immutableAuditLogs.$inferSelect;
+export type InsertImmutableAuditLog = typeof immutableAuditLogs.$inferInsert;
+
+// userId é string, não precisa de relação direta para users table
