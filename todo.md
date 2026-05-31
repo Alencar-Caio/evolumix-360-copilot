@@ -236,6 +236,18 @@
   - [x] Princípio de menor privilégio
   - [x] Auditoria de acesso
   - [x] 13 testes passando
-- [ ] Adicionar Incident Response Playbook
-- [ ] Implementar Cost Optimization Dashboard
+- [x] Incident Response (Utilitário) - Completo
+  - [x] Criação e rastreamento de incidentes
+  - [x] Gerenciamento de ações
+  - [x] Playbook de resposta
+  - [x] MTTR e taxa de resolução
+  - [x] 16 testes passando
+- [ ] Incident Response Playbook (Integração Real com tRPC/UI)
+- [x] Cost Optimization (Utilitário) - Completo
+  - [x] Rastreamento de custos por serviço
+  - [x] Análise de desperdício
+  - [x] Recomendações de otimização
+  - [x] Projeção de custos futuros
+  - [x] 19 testes passando
+- [ ] Cost Optimization Dashboard (Integração Real com UI/Gráficos)
 - [ ] Adicionar Performance Baseline e Regression Testing
