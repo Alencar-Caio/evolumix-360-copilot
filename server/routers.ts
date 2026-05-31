@@ -1,6 +1,8 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { healthRouter } from "./_core/healthRouter";
+import { circuitBreakerRouter } from "./_core/circuitBreakerRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { documentsRouter } from "./routers/documents";
 import { copilotRouter } from "./routers/copilot";
@@ -13,6 +15,8 @@ import { exportRouter } from "./routers/export";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
+  health: healthRouter,
+  circuitBreaker: circuitBreakerRouter,
   system: systemRouter,
   documents: documentsRouter,
   copilot: copilotRouter,
