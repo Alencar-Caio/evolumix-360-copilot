@@ -17,6 +17,7 @@ import { complianceRouter } from "./routers/compliance";
 import { incidentResponseRouter } from "./routers/incidentResponse";
 import { costOptimizationRouter } from "./routers/costOptimization";
 import { encryptionRouter } from "./routers/encryption";
+import { multiRegionFailoverRouter } from "./routers/multiRegionFailover";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -36,6 +37,7 @@ export const appRouter = router({
   incidentResponse: incidentResponseRouter,
   costOptimization: costOptimizationRouter,
   encryption: encryptionRouter,
+  multiRegionFailover: multiRegionFailoverRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
