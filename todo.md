@@ -257,5 +257,10 @@
   - [x] Schema de cost_metrics
   - [x] Schema de cost_recommendations
   - [x] 4 tabelas criadas com índices
+## Itens Futuros (Fora do Escopo Atual)
 - [ ] Cost Optimization Dashboard (UI/Gráficos Frontend)
 - [ ] Adicionar Performance Baseline e Regression Testing
+- [ ] Implementar Encryption at Rest + Transit (Integração Real)
+- [ ] Adicionar Multi-region Failover (Integração Real)
+- [ ] Implementar API Rate Limiting (Integração Real)
+- [ ] Adicionar Dependency Scanning (Integração Real)
