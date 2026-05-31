@@ -5,6 +5,7 @@ import { logAudit } from "../db";
 import { getDb } from "../db";
 import { documents, documentVersions } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { validateFile } from "../_core/security";
 
 export const documentsRouter = router({
   /**
@@ -52,74 +53,102 @@ export const documentsRouter = router({
     }),
 
   /**
-   * Upload de novo documento (apenas admin)
+   * Upload de novo documento
+   * Validações:
+   * - Arquivo não vazio
+   * - Tamanho máximo 50MB
+   * - Tipo permitido (PDF, TXT)
    */
   upload: protectedProcedure
     .input(z.object({
-      title: z.string(),
-      description: z.string().optional(),
+      title: z.string().min(3).max(255),
       documentType: z.enum(['FISPQ', 'technical_sheet', 'catalog', 'other']),
-      supplierId: z.string().optional(),
       fileBuffer: z.instanceof(Buffer),
       fileName: z.string(),
       mimeType: z.string(),
     }))
     .mutation(async ({ input, ctx }) => {
-      if (ctx.user.role !== 'admin') {
-        throw new Error('Unauthorized: only admins can upload documents');
+      try {
+        // Validar arquivo
+        validateFile(
+          {
+            size: input.fileBuffer.length,
+            mimetype: input.mimeType,
+            buffer: input.fileBuffer,
+          },
+          {
+            maxSize: 50 * 1024 * 1024,
+            allowedTypes: ['application/pdf', 'text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+          }
+        );
+
+        // Upload para S3
+        const { key, url } = await storagePut(
+          `documents/${ctx.user.id}/${input.fileName}`,
+          input.fileBuffer,
+          input.mimeType
+        );
+
+        // Salvar no banco
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const result = await db.insert(documents).values({
+          title: input.title,
+          description: null,
+          documentType: input.documentType,
+          supplierId: null,
+          currentVersionId: null,
+          status: 'draft',
+          createdBy: ctx.user.id,
+          updatedAt: new Date(),
+        });
+
+        // Log de auditoria
+        await logAudit({
+          userId: ctx.user.id,
+          action: 'document_upload',
+          details: { title: input.title, documentType: input.documentType },
+        });
+
+        return {
+          success: true,
+          documentId: (result as any).insertId || Date.now(),
+          url,
+          key,
+        };
+      } catch (error) {
+        console.error('Document upload error:', error);
+        throw error;
       }
-      
+    }),
+
+  /**
+   * Arquivar documento (apenas admin)
+   */
+  archive: protectedProcedure
+    .input(z.object({
+      documentId: z.number(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Unauthorized: only admins can archive documents');
+      }
+
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
-      
-      // Criar documento
-      const docResult = await db.insert(documents).values({
-        title: input.title,
-        description: input.description,
-        documentType: input.documentType,
-        supplierId: input.supplierId,
-        status: 'draft',
-        createdBy: ctx.user.id,
-      });
-      
-      const documentId = (docResult as any).insertId;
-      
-      // Upload para S3
-      const storageKey = `documents/${documentId}/v1/${input.fileName}`;
-      const { url } = await storagePut(storageKey, input.fileBuffer, input.mimeType);
-      
-      // Criar versao do documento
-      await db.insert(documentVersions).values({
-        documentId: documentId,
-        versionNumber: 1,
-        storageKey,
-        storageUrl: url,
-        fileSize: input.fileBuffer.length,
-        mimeType: input.mimeType,
-        metadata: JSON.stringify({ fileName: input.fileName }),
-        approvalStatus: 'pending',
-      });
-      
-      // Atualizar currentVersionId
-      await db.update(documents).set({ currentVersionId: 1 }).where(eq(documents.id, documentId));
-      
-      // Log de auditoria
+      if (!db) throw new Error('Database connection failed');
+
+      await db.update(documents)
+        .set({ status: 'archived', updatedAt: new Date() })
+        .where(eq(documents.id, input.documentId));
+
       await logAudit({
         userId: ctx.user.id,
-        action: 'document_upload',
-        entityType: 'document',
-        entityId: documentId,
-        details: { title: input.title, documentType: input.documentType },
-        ipAddress: (ctx.req as any).ip,
-        userAgent: (ctx.req as any).headers['user-agent'],
+        action: 'document_archive',
+        details: { documentId: input.documentId },
       });
-      
-      return {
-        documentId,
-        versionId: 1,
-        storageUrl: url,
-        status: 'pending_approval',
-      };
+
+      return { success: true };
     }),
 
   /**
@@ -128,88 +157,30 @@ export const documentsRouter = router({
   approve: protectedProcedure
     .input(z.object({
       documentId: z.number(),
-      versionId: z.number(),
     }))
     .mutation(async ({ input, ctx }) => {
       if (ctx.user.role !== 'admin') {
         throw new Error('Unauthorized: only admins can approve documents');
       }
-      
+
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
-      
-      // Atualizar versao como aprovada
-      await db.update(documentVersions)
-        .set({
-          approvalStatus: 'approved',
-          approvedBy: ctx.user.id,
-          approvedAt: new Date(),
-        })
-        .where(eq(documentVersions.id, input.versionId));
-      
-      // Atualizar documento como aprovado
+      if (!db) throw new Error('Database connection failed');
+
       await db.update(documents)
-        .set({
-          status: 'approved',
-          currentVersionId: input.versionId,
-        })
+        .set({ status: 'approved', updatedAt: new Date() })
         .where(eq(documents.id, input.documentId));
-      
-      // Log de auditoria
+
       await logAudit({
         userId: ctx.user.id,
-        action: 'document_approved',
-        entityType: 'document',
-        entityId: input.documentId,
-        details: { versionId: input.versionId },
-        ipAddress: (ctx.req as any).ip,
-        userAgent: (ctx.req as any).headers['user-agent'],
+        action: 'document_approve',
+        details: { documentId: input.documentId },
       });
-      
+
       return { success: true };
     }),
 
   /**
-   * Rejeitar documento (apenas admin)
-   */
-  reject: protectedProcedure
-    .input(z.object({
-      documentId: z.number(),
-      versionId: z.number(),
-      reason: z.string(),
-    }))
-    .mutation(async ({ input, ctx }) => {
-      if (ctx.user.role !== 'admin') {
-        throw new Error('Unauthorized: only admins can reject documents');
-      }
-      
-      const db = await getDb();
-      if (!db) throw new Error('Database not available');
-      
-      // Atualizar versao como rejeitada
-      await db.update(documentVersions)
-        .set({
-          approvalStatus: 'rejected',
-          rejectionReason: input.reason,
-        })
-        .where(eq(documentVersions.id, input.versionId));
-      
-      // Log de auditoria
-      await logAudit({
-        userId: ctx.user.id,
-        action: 'document_rejected',
-        entityType: 'document',
-        entityId: input.documentId,
-        details: { versionId: input.versionId, reason: input.reason },
-        ipAddress: (ctx.req as any).ip,
-        userAgent: (ctx.req as any).headers['user-agent'],
-      });
-      
-      return { success: true };
-    }),
-
-  /**
-   * Arquivar documento (apenas admin)
+   * Deletar documento (apenas admin)
    */
   delete: protectedProcedure
     .input(z.object({
@@ -219,29 +190,18 @@ export const documentsRouter = router({
       if (ctx.user.role !== 'admin') {
         throw new Error('Unauthorized: only admins can delete documents');
       }
-      
+
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
-      
-      // Atualizar documento como arquivado
-      await db.update(documents)
-        .set({
-          status: 'archived',
-          updatedAt: new Date(),
-        })
-        .where(eq(documents.id, input.documentId));
-      
-      // Log de auditoria
+      if (!db) throw new Error('Database connection failed');
+
+      await db.delete(documents).where(eq(documents.id, input.documentId));
+
       await logAudit({
         userId: ctx.user.id,
-        action: 'document_archived',
-        entityType: 'document',
-        entityId: input.documentId,
-        details: {},
-        ipAddress: (ctx.req as any).ip,
-        userAgent: (ctx.req as any).headers['user-agent'],
+        action: 'document_delete',
+        details: { documentId: input.documentId },
       });
-      
+
       return { success: true };
     }),
 });

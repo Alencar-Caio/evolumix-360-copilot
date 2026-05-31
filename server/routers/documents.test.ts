@@ -74,10 +74,5 @@ describe('Documents Router', () => {
     });
   });
 
-  describe('reject', () => {
-    it('should reject a document version with reason', async () => {
-      expect(documentsRouter).toBeDefined();
-      expect(documentsRouter._def.procedures.reject).toBeDefined();
-    });
-  });
+
 });

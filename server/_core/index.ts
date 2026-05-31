@@ -8,6 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { rateLimitMiddleware, corsMiddleware, securityHeadersMiddleware, errorHandler } from "./security";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,6 +32,12 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Security middleware (deve ser primeiro)
+  app.use(rateLimitMiddleware);
+  app.use(corsMiddleware);
+  app.use(securityHeadersMiddleware);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -58,6 +65,9 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
+  // Error handler (deve ser o último middleware)
+  app.use(errorHandler);
+  
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });
