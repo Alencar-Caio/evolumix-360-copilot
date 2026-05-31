@@ -169,7 +169,8 @@ Retorne um JSON com a estrutura:
 
       // Parse resposta
       const content = llmResponse.choices[0].message.content;
-      const parsed = JSON.parse(content);
+      const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
+      const parsed = JSON.parse(contentStr);
 
       // 2. Mapear para chunks
       const citations: Citation[] = parsed.citations.map((c: any, idx: number) => {
@@ -265,7 +266,8 @@ Retorne um JSON com:
       });
 
       const content = response.choices[0].message.content;
-      return JSON.parse(content);
+      const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
+      return JSON.parse(contentStr);
     } catch (error) {
       console.error('Erro ao validar fidelidade:', error);
       throw error;
