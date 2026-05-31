@@ -132,6 +132,17 @@
 - [x] Responsividade mobile-first
 
 
+## Fase 2 - RAG Robustness (Em Progresso)
+- [x] Fase 2.1: Cross-Validation (Hallucination Detection) - Completo
+- [x] Fase 2.2: Conversation History - Completo
+  - [x] Schema de conversas e mensagens
+  - [x] Funções CRUD de conversa
+  - [x] Persistência de histórico
+  - [x] Testes de tipos
+- [ ] Fase 2.3: Immutable Audit Trail (Hash Chain)
+- [ ] Fase 2.4: Document Indexing Optimization
+- [ ] Fase 2.5: Quality Assurance Pipeline
+
 ## Padrão Ouro Internacional - SOTA 2026 (Auditoria)
 - [ ] Implementar FIPS 140-2 Level 2 Compliance para criptografia
 - [ ] Adicionar Distributed Tracing (OpenTelemetry + Jaeger)

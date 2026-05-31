@@ -1,5 +1,6 @@
 import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, decimal, index, bigint } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
+import { longtext } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -279,3 +280,44 @@ export type ImmutableAuditLog = typeof immutableAuditLogs.$inferSelect;
 export type InsertImmutableAuditLog = typeof immutableAuditLogs.$inferInsert;
 
 // userId é string, não precisa de relação direta para users table
+
+
+/**
+ * Conversas de chat com RAG
+ */
+export const conversations = mysqlTable('conversations', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  organizationId: varchar('organization_id', { length: 255 }).notNull(),
+  title: varchar('title', { length: 255 }),
+  status: mysqlEnum('status', ['active', 'archived', 'deleted']).default('active').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+}, (table) => ({
+  userIdIdx: index('idx_conversations_user_id').on(table.userId),
+  organizationIdIdx: index('idx_conversations_organization_id').on(table.organizationId),
+  statusIdx: index('idx_conversations_status').on(table.status),
+  createdAtIdx: index('idx_conversations_created_at').on(table.createdAt),
+}));
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = typeof conversations.$inferInsert;
+
+/**
+ * Mensagens de chat
+ */
+export const conversationMessages = mysqlTable('conversation_messages', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  conversationId: varchar('conversation_id', { length: 255 }).notNull(),
+  role: mysqlEnum('role', ['user', 'assistant']).notNull(),
+  content: longtext('content').notNull(),
+  metadata: json('metadata').$type<Record<string, any>>(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  conversationIdIdx: index('idx_messages_conversation_id').on(table.conversationId),
+  roleIdx: index('idx_messages_role').on(table.role),
+  createdAtIdx: index('idx_messages_created_at').on(table.createdAt),
+}));
+
+export type ConversationMessage = typeof conversationMessages.$inferSelect;
+export type InsertConversationMessage = typeof conversationMessages.$inferInsert;
