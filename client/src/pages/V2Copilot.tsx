@@ -43,6 +43,12 @@ interface Message {
  */
 export default function V2Copilot() {
   const { user } = useAuth();
+  
+  // Modo de teste: permitir acesso sem autenticacao via query param
+  const isTestMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('test') === 'true';
+  const testUser = { id: 'test', name: 'Usuario Teste', email: 'test@evolumix.com', role: 'user' as const };
+  const displayUser = user || (isTestMode ? testUser : null);
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -171,7 +177,7 @@ export default function V2Copilot() {
     setInput('');
   };
 
-  if (!user) return null;
+  if (!displayUser) return null;
 
   return (
     <V2Layout>

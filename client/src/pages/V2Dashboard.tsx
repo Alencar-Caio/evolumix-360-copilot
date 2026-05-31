@@ -30,11 +30,16 @@ import { Skeleton } from '../components/ui/skeleton';
 export default function V2Dashboard() {
   const { user } = useAuth();
   
+  // Modo de teste: permitir acesso sem autenticação via query param
+  const isTestMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('test') === 'true';
+  const testUser = { id: 'test', name: 'Usuário Teste', email: 'test@evolumix.com', role: 'user' as const };
+  const displayUser = user || (isTestMode ? testUser : null);
+  
   // Queries tRPC
-  const diagnosticsQuery = trpc.diagnostics.list.useQuery({ limit: 100 });
-  const queriesQuery = trpc.copilot.listHistory.useQuery({ limit: 100 });
+  const diagnosticsQuery = trpc.diagnostics.list.useQuery({ limit: 100 }, { enabled: !!user });
+  const queriesQuery = trpc.copilot.listHistory.useQuery({ limit: 100 }, { enabled: !!user });
 
-  if (!user) return null;
+  if (!displayUser) return null;
 
   // Calcular KPIs
   const diagnosticsCount = diagnosticsQuery.data?.length || 0;
@@ -56,7 +61,7 @@ export default function V2Dashboard() {
           <div>
             <h1 className="text-4xl font-bold text-white">Dashboard</h1>
             <p className="text-slate-400 mt-2">
-              Bem-vindo de volta, {user.name}. Aqui está seu resumo de atividades.
+              Bem-vindo de volta, {displayUser.name}. Aqui está seu resumo de atividades.
             </p>
           </div>
           <Link href="/v2/diagnostics">

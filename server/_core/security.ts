@@ -19,7 +19,8 @@ const requestCounts = new Map<string, { count: number; resetTime: number }>();
 export const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const ip = req.ip || 'unknown';
   const now = Date.now();
-  const limit = 100; // 100 requests
+  // Em desenvolvimento: limite alto (1000 req/min), em produção: 100 req/min
+  const limit = process.env.NODE_ENV === 'development' ? 1000 : 100;
   const windowMs = 60 * 1000; // 1 minuto
 
   const record = requestCounts.get(ip);

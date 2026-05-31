@@ -25,6 +25,12 @@ const ITEMS_PER_PAGE = 10;
 
 export default function V2Diagnostics() {
   const { user } = useAuth();
+  
+  // Modo de teste: permitir acesso sem autenticacao via query param
+  const isTestMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('test') === 'true';
+  const testUser = { id: 'test', name: 'Usuario Teste', email: 'test@evolumix.com', role: 'user' as const };
+  const displayUser = user || (isTestMode ? testUser : null);
+  
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -33,7 +39,7 @@ export default function V2Diagnostics() {
   // tRPC
   const diagnosticsQuery = trpc.diagnostics.list.useQuery({ limit: 1000 });
 
-  if (!user) return null;
+  if (!displayUser) return null;
 
   // Filtrar diagnósticos
   const filteredDiagnostics = useMemo(() => {

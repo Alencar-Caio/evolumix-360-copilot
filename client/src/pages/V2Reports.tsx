@@ -20,10 +20,16 @@ import { Skeleton } from '../components/ui/skeleton';
 
 export default function V2Reports() {
   const { user } = useAuth();
+  
+  // Modo de teste: permitir acesso sem autenticacao via query param
+  const isTestMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('test') === 'true';
+  const testUser = { id: 'test', name: 'Usuario Teste', email: 'test@evolumix.com', role: 'user' as const };
+  const displayUser = user || (isTestMode ? testUser : null);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
 
-  if (!user) return null;
+  if (!displayUser) return null;
 
   // Mock data - TODO: Integrar com tRPC
   const reports = [

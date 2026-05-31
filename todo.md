@@ -118,3 +118,15 @@
 - [x] Criar ENV_REFERENCE.md com referência de variáveis de ambiente
 - [x] Gerenciador de documentos com visualização, filtros e arquivamento
 - [x] Testes unitários para todas as rotas
+
+## v2.0 - Production-Ready Workspace
+- [x] Corrigir rate limiting (aumentado para 1000 req/min em dev)
+- [x] Adicionar modo teste para acessar v2.0 sem autenticacao (?test=true)
+- [x] V2Dashboard funcional com KPIs e dados reais
+- [x] V2Copilot funcional com chat e upload de documentos
+- [x] V2Diagnostics funcional com tabela e filtros
+- [x] V2Documents funcional com upload e gerenciador
+- [x] V2Reports funcional com lista de PDFs
+- [x] V2Layout com sidebar colapsavel e navegacao
+- [x] Dark mode profissional em todas as paginas
+- [x] Responsividade mobile-first

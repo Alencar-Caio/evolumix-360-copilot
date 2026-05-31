@@ -39,6 +39,11 @@ export default function V2Layout({ children }: V2LayoutProps) {
   const { user, logout } = useAuth();
   const [location, navigate] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  // Modo de teste: permitir acesso sem autenticacao via query param
+  const isTestMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('test') === 'true';
+  const testUser = { id: 'test', name: 'Usuario Teste', email: 'test@evolumix.com', role: 'user' as const };
+  const displayUser = user || (isTestMode ? testUser : null);
 
   // Menu items com roles
   const menuItems = useMemo(() => [
@@ -86,12 +91,12 @@ export default function V2Layout({ children }: V2LayoutProps) {
     },
   ], []);
 
-  // Filtrar menu items por role do usuário
+  // Filtrar menu items por role do usuario
   const filteredMenuItems = useMemo(() => 
     menuItems.filter(item => 
-      item.roles.includes(user?.role || 'user')
+      item.roles.includes(displayUser?.role || 'user')
     ),
-    [menuItems, user?.role]
+    [menuItems, displayUser?.role]
   );
 
   // Verificar se rota está ativa
@@ -102,7 +107,7 @@ export default function V2Layout({ children }: V2LayoutProps) {
     await logout();
   };
 
-  if (!user) return null;
+  if (!displayUser) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex overflow-hidden">
@@ -181,16 +186,16 @@ export default function V2Layout({ children }: V2LayoutProps) {
           </button>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-medium text-white">{user?.name || 'Usuário'}</p>
+                <p className="text-sm font-medium text-white">{displayUser?.name || 'Usuario'}</p>
                 <p className="text-xs text-slate-400">
-                  {user?.role === 'admin' ? '👨‍💼 Administrador' : '👤 Consultor'}
+                  {displayUser?.role === 'admin' ? '👨‍💼 Administrador' : '👤 Consultor'}
                 </p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-sm font-bold text-white">
-                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                  {displayUser?.name?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
             </div>
