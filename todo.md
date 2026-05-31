@@ -215,8 +215,16 @@
   - [x] HMAC e hash seguro
   - [x] 20 testes passando
 - [ ] Implementar Encryption at Rest + Transit (Integração Real)
-- [ ] Adicionar Multi-region Failover
-- [ ] Implementar API Rate Limiting com Token Bucket
+- [x] Multi-region Failover (Utilitário) - Completo
+  - [x] Health checks simulados
+  - [x] Detecção de falhas
+  - [x] 13 testes passando
+- [ ] Adicionar Multi-region Failover (Integração Real)
+- [x] Rate Limiter (Utilitário) - Completo
+  - [x] Token Bucket algorithm
+  - [x] Limites por IP/usuário
+  - [x] 14 testes passando
+- [ ] Implementar API Rate Limiting (Integração Real)
 - [ ] Adicionar Dependency Scanning (SBOM)
 - [ ] Implementar Zero-Trust Architecture
 - [ ] Adicionar Incident Response Playbook
