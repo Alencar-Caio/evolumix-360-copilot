@@ -12,10 +12,12 @@ import DiagnosticDetail from "./pages/DiagnosticDetail";
 import ApprovalsPanel from "./pages/ApprovalsPanel";
 import AuditDashboard from "./pages/AuditDashboard";
 import DocumentsManager from "./pages/DocumentsManager";
-import V2 from "./pages/V2";
-import AdminDashboard from "./pages/AdminDashboard";
 import V2Dashboard from "./pages/V2Dashboard";
 import V2Copilot from "./pages/V2Copilot";
+import V2Diagnostics from "./pages/V2Diagnostics";
+import V2Documents from "./pages/V2Documents";
+import V2Reports from "./pages/V2Reports";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -31,6 +33,9 @@ function Router() {
       <Route path="/documents" component={DocumentsManager} />
       <Route path="/v2" component={V2Dashboard} />
       <Route path="/v2/copilot" component={V2Copilot} />
+      <Route path="/v2/diagnostics" component={V2Diagnostics} />
+      <Route path="/v2/documents" component={V2Documents} />
+      <Route path="/v2/reports" component={V2Reports} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
