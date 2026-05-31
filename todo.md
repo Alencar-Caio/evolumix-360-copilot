@@ -200,7 +200,14 @@
   - [x] Tracing em todos os endpoints
   - [x] Controle de acesso (admin-only)
   - [x] 8 testes passando
-- [ ] Adicionar Compliance Scanner (OWASP, CIS Benchmarks)
+- [x] Adicionar Compliance Scanner (OWASP, CIS Benchmarks) - Completo
+  - [x] OWASP Top 10 2024 (10 checks)
+  - [x] CIS Benchmarks (5+ checks)
+  - [x] Execução de scans
+  - [x] Relatórios de conformidade
+  - [x] 11 testes passando
+  - [x] Real Compliance Scan (validações reais do app)
+  - [x] 14 testes passando
 - [ ] Implementar Encryption at Rest + Transit (TLS 1.3)
 - [ ] Adicionar Multi-region Failover
 - [ ] Implementar API Rate Limiting com Token Bucket
