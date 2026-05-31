@@ -60,41 +60,25 @@ export default function V2Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1 container py-8">
-        {/* Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-slate-700/50 pb-4">
-          {(['overview', 'diagnostics', 'chat', 'analytics'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                activeTab === tab
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+        {/* Navigation Links */}
+        <div className="flex gap-2 mb-8 border-b border-slate-700/50 pb-4 overflow-x-auto">
+          <a href="/v2" className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 whitespace-nowrap">
+            Dashboard
+          </a>
+          <a href="/v2/copilot" className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all duration-300 whitespace-nowrap">
+            Copiloto
+          </a>
+          <a href="/v2/diagnostics" className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all duration-300 whitespace-nowrap">
+            Diagnósticos
+          </a>
+          <a href="/documents" className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all duration-300 whitespace-nowrap">
+            Documentos
+          </a>
         </div>
 
-        {/* Tab Content */}
+        {/* Dashboard Overview */}
         <div className="animate-fade-in">
-          {activeTab === 'overview' && <V2OverviewTab />}
-          {activeTab === 'diagnostics' && (
-            <Suspense fallback={<LoadingSkeleton />}>
-              <V2DiagnosticsList />
-            </Suspense>
-          )}
-          {activeTab === 'chat' && (
-            <Suspense fallback={<LoadingSkeleton />}>
-              <V2ChatBox />
-            </Suspense>
-          )}
-          {activeTab === 'analytics' && (
-            <Suspense fallback={<LoadingSkeleton />}>
-              <V2Analytics />
-            </Suspense>
-          )}
+          <V2OverviewTab />
         </div>
       </div>
 

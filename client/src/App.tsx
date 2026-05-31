@@ -14,6 +14,8 @@ import AuditDashboard from "./pages/AuditDashboard";
 import DocumentsManager from "./pages/DocumentsManager";
 import { V2Home } from "./pages/V2Home";
 import V2Dashboard from "./pages/V2Dashboard";
+import V2Copilot from "./pages/V2Copilot";
+import V2Diagnostics from "./pages/V2Diagnostics";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -29,6 +31,8 @@ function Router() {
       <Route path="/documents" component={DocumentsManager} />
       <Route path="/v2" component={V2Dashboard} />
       <Route path="/v2/home" component={V2Home} />
+      <Route path="/v2/copilot" component={V2Copilot} />
+      <Route path="/v2/diagnostics" component={V2Diagnostics} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
