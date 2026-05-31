@@ -303,6 +303,71 @@
   - [x] GetStatistics: Estatísticas
   - [x] 5 testes passando
 
-## Itens Futuros (Fora do Escopo Atual)
-- [ ] Implementar API Rate Limiting (Integração Real)
-- [ ] Adicionar Dependency Scanning (Integração Real)
+## Fase 13 - Rate Limiting Integration (COMPLETO)
+- [x] Implementar API Rate Limiting (Integração Real) - Completo
+  - [x] Rate Limiter Router com 6 endpoints tRPC
+  - [x] Check: Verificar limite de taxa
+  - [x] GetRemaining: Tokens restantes
+  - [x] GetResetAt: Tempo de reset
+  - [x] GetStatistics: Estatísticas
+  - [x] GetAllowRate: Taxa de permissão
+  - [x] 9 testes passando
+
+## Fase 14 - Dependency Scanning Integration (COMPLETO)
+- [x] Adicionar Dependency Scanning (Integração Real) - Completo
+  - [x] Dependency Scanner Router com 5 endpoints tRPC
+  - [x] GenerateSBOM: Gerar Software Bill of Materials
+  - [x] GetCriticalVulnerabilities: Vulnerabilidades críticas
+  - [x] GetLicenseCompliance: Conformidade de licenças
+  - [x] GetStatistics: Estatísticas de scanning
+  - [x] ExportSBOM: Exportar em JSON/XML/CSV
+  - [x] 8 testes passando
+
+
+## Fase 13 - Rate Limiting Integration (COMPLETO)
+- [x] Implementar API Rate Limiting (Integração Real) - Completo
+  - [x] Rate Limiter Router com 6 endpoints tRPC
+  - [x] checkLimit: Verificar limite de taxa
+  - [x] getRemaining: Tokens restantes
+  - [x] getResetAt: Tempo de reset
+  - [x] getAllowRate: Taxa de permissão
+  - [x] getStatistics: Estatísticas
+  - [x] reset: Resetar rate limiter (admin-only)
+  - [x] getConfig: Obter configuração
+  - [x] Middleware Express para aplicar rate limiting real
+  - [x] rateLimitMiddleware: Middleware geral
+  - [x] strictRateLimitMiddleware: Middleware para endpoints críticos
+  - [x] adminRateLimitBypass: Bypass para admins
+  - [x] 9 testes passando
+
+## Fase 14 - Dependency Scanning Integration (COMPLETO)
+- [x] Adicionar Dependency Scanning (Integração Real) - Completo
+  - [x] Dependency Scanner Router com 5 endpoints tRPC
+  - [x] generateSBOM: Gerar Software Bill of Materials real
+  - [x] getCriticalVulnerabilities: Vulnerabilidades críticas
+  - [x] getLicenseCompliance: Conformidade de licenças
+  - [x] getStatistics: Estatísticas de scanning
+  - [x] exportSBOM: Exportar em JSON/XML/CSV
+  - [x] Implementação real com leitura de package.json
+  - [x] Análise de dependências diretas e devDependencies
+  - [x] Detecção de vulnerabilidades conhecidas
+  - [x] Conformidade de licenças com tratamento de edge cases
+  - [x] 8 testes passando
+
+## Fase 15 - GitHub Export & Documentation (EM ANDAMENTO)
+- [ ] Exportar código para GitHub
+- [ ] Criar repositório com histórico completo
+- [ ] Configurar CI/CD pipeline
+- [ ] Documentação de deployment
+
+## Fase 16 - Onboarding & Knowledge Transfer (PENDENTE)
+- [ ] Onboarding Guide para time técnico
+- [ ] Welcome Guide para usuários
+- [ ] Technical Deep-dive Report
+- [ ] API Documentation
+
+## Fase 17 - Final Handoff (PENDENTE)
+- [ ] Verificação final de funcionalidades
+- [ ] Testes de produção
+- [ ] Transferência de propriedade
+- [ ] Suporte inicial

@@ -257,3 +257,55 @@ export function resetRateLimiter(): void {
     deniedRequests: 0,
   };
 }
+
+/**
+ * Obter tokens restantes para um cliente específico
+ */
+export function getRemainingTokens(ip: string, userId?: string): number {
+  let remaining = 0;
+
+  const ipBucket = ipBuckets.get(ip);
+  if (ipBucket) {
+    refillBucket(ipBucket);
+    remaining = Math.floor(ipBucket.tokens);
+  }
+
+  if (userId) {
+    const userBucket = userBuckets.get(userId);
+    if (userBucket) {
+      refillBucket(userBucket);
+      remaining = Math.min(remaining, Math.floor(userBucket.tokens));
+    }
+  }
+
+  return remaining;
+}
+
+/**
+ * Obter tempo de reset para um cliente específico
+ */
+export function getResetTime(ip: string, userId?: string): number {
+  let resetTime = Date.now() + 1000;
+
+  const ipBucket = ipBuckets.get(ip);
+  if (ipBucket) {
+    resetTime = Math.max(resetTime, ipBucket.lastRefill + 1000);
+  }
+
+  if (userId) {
+    const userBucket = userBuckets.get(userId);
+    if (userBucket) {
+      resetTime = Math.max(resetTime, userBucket.lastRefill + 1000);
+    }
+  }
+
+  return resetTime;
+}
+
+/**
+ * Obter taxa de permissão (allow rate)
+ */
+export function getAllowRate(): number {
+  if (stats.totalRequests === 0) return 1.0;
+  return (stats.allowedRequests / stats.totalRequests);
+}
