@@ -321,3 +321,104 @@ export const conversationMessages = mysqlTable('conversation_messages', {
 
 export type ConversationMessage = typeof conversationMessages.$inferSelect;
 export type InsertConversationMessage = typeof conversationMessages.$inferInsert;
+
+
+/**
+ * Incident Response - Rastreamento de incidentes de segurança
+ */
+export const securityIncidents = mysqlTable('security_incidents', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  type: mysqlEnum('type', [
+    'security_breach',
+    'data_loss',
+    'unauthorized_access',
+    'malware_detected',
+    'ddos_attack',
+    'service_degradation',
+    'configuration_error',
+  ]).notNull(),
+  severity: mysqlEnum('severity', ['critical', 'high', 'medium', 'low']).notNull(),
+  status: mysqlEnum('status', ['open', 'investigating', 'contained', 'resolved', 'closed']).default('open').notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: longtext('description').notNull(),
+  affectedSystems: json('affected_systems').$type<string[]>().notNull(),
+  affectedUsers: int('affected_users').default(0),
+  rootCause: text('root_cause'),
+  detectedAt: timestamp('detected_at').notNull().defaultNow(),
+  reportedAt: timestamp('reported_at'),
+  containedAt: timestamp('contained_at'),
+  resolvedAt: timestamp('resolved_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+}, (table) => ({
+  typeIdx: index('idx_incidents_type').on(table.type),
+  severityIdx: index('idx_incidents_severity').on(table.severity),
+  statusIdx: index('idx_incidents_status').on(table.status),
+  detectedAtIdx: index('idx_incidents_detected_at').on(table.detectedAt),
+}));
+
+export type SecurityIncident = typeof securityIncidents.$inferSelect;
+export type InsertSecurityIncident = typeof securityIncidents.$inferInsert;
+
+/**
+ * Ações de resposta a incidentes
+ */
+export const incidentActions = mysqlTable('incident_actions', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  incidentId: varchar('incident_id', { length: 255 }).notNull(),
+  action: varchar('action', { length: 255 }).notNull(),
+  performer: varchar('performer', { length: 255 }).notNull(),
+  status: mysqlEnum('status', ['pending', 'in_progress', 'completed']).default('completed').notNull(),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  incidentIdIdx: index('idx_actions_incident_id').on(table.incidentId),
+  performerIdx: index('idx_actions_performer').on(table.performer),
+  createdAtIdx: index('idx_actions_created_at').on(table.createdAt),
+}));
+
+export type IncidentAction = typeof incidentActions.$inferSelect;
+export type InsertIncidentAction = typeof incidentActions.$inferInsert;
+
+/**
+ * Cost Optimization - Rastreamento de custos
+ */
+export const costMetrics = mysqlTable('cost_metrics', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  service: varchar('service', { length: 255 }).notNull(),
+  cost: decimal('cost', { precision: 12, scale: 2 }).notNull(),
+  unit: varchar('unit', { length: 100 }).notNull(),
+  quantity: int('quantity').notNull(),
+  recordedAt: timestamp('recorded_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  serviceIdx: index('idx_cost_service').on(table.service),
+  recordedAtIdx: index('idx_cost_recorded_at').on(table.recordedAt),
+}));
+
+export type CostMetric = typeof costMetrics.$inferSelect;
+export type InsertCostMetric = typeof costMetrics.$inferInsert;
+
+/**
+ * Recomendações de otimização de custos
+ */
+export const costRecommendations = mysqlTable('cost_recommendations', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  service: varchar('service', { length: 255 }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: longtext('description').notNull(),
+  estimatedSavings: decimal('estimated_savings', { precision: 12, scale: 2 }).notNull(),
+  priority: mysqlEnum('priority', ['high', 'medium', 'low']).notNull(),
+  implementationDifficulty: mysqlEnum('implementation_difficulty', ['easy', 'medium', 'hard']).notNull(),
+  actionItems: json('action_items').$type<string[]>().notNull(),
+  status: mysqlEnum('status', ['pending', 'in_progress', 'completed']).default('pending').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+}, (table) => ({
+  serviceIdx: index('idx_recommendations_service').on(table.service),
+  priorityIdx: index('idx_recommendations_priority').on(table.priority),
+  statusIdx: index('idx_recommendations_status').on(table.status),
+}));
+
+export type CostRecommendation = typeof costRecommendations.$inferSelect;
+export type InsertCostRecommendation = typeof costRecommendations.$inferInsert;

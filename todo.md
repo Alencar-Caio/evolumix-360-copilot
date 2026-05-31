@@ -242,12 +242,20 @@
   - [x] Playbook de resposta
   - [x] MTTR e taxa de resolução
   - [x] 16 testes passando
-- [ ] Incident Response Playbook (Integração Real com tRPC/UI)
-- [x] Cost Optimization (Utilitário) - Completo
-  - [x] Rastreamento de custos por serviço
-  - [x] Análise de desperdício
+- [x] Incident Response Playbook (Integração com tRPC) - Completo
+  - [x] 6 endpoints tRPC
+  - [x] Controle de acesso (admin-only)
+  - [x] 7 testes de integração passando
+- [x] Cost Optimization (Integração com tRPC) - Completo
+  - [x] 7 endpoints tRPC
+  - [x] Análise de custos
   - [x] Recomendações de otimização
-  - [x] Projeção de custos futuros
-  - [x] 19 testes passando
-- [ ] Cost Optimization Dashboard (Integração Real com UI/Gráficos)
+  - [x] 8 testes de integração passando
+- [x] Persistência em Banco de Dados - Completo
+  - [x] Schema de security_incidents
+  - [x] Schema de incident_actions
+  - [x] Schema de cost_metrics
+  - [x] Schema de cost_recommendations
+  - [x] 4 tabelas criadas com índices
+- [ ] Cost Optimization Dashboard (UI/Gráficos Frontend)
 - [ ] Adicionar Performance Baseline e Regression Testing
