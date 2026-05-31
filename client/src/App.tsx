@@ -13,6 +13,7 @@ import ApprovalsPanel from "./pages/ApprovalsPanel";
 import AuditDashboard from "./pages/AuditDashboard";
 import DocumentsManager from "./pages/DocumentsManager";
 import V2 from "./pages/V2";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/audit" component={AuditDashboard} />
       <Route path="/documents" component={DocumentsManager} />
       <Route path="/v2" component={V2} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

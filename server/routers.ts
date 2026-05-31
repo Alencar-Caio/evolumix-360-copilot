@@ -9,6 +9,7 @@ import { approvalsRouter } from "./routers/approvals";
 import { whatsappRouter } from "./routers/whatsapp";
 import { exportsRouter } from "./routers/exports";
 import { crmRouter } from "./routers/crm";
+import { exportRouter } from "./routers/export";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -19,6 +20,7 @@ export const appRouter = router({
   approvals: approvalsRouter,
   whatsapp: whatsappRouter,
   exports: exportsRouter,
+  export: exportRouter,
   crm: crmRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
