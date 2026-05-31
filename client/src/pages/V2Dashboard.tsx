@@ -38,7 +38,20 @@ export default function V2Dashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'diagnostics' | 'chat' | 'analytics'>('overview');
 
-  if (!user) return null;
+  // Se não autenticado, mostrar página de login
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+        <Card className="backdrop-blur-xl bg-slate-800/50 border-slate-700/50 p-8 max-w-md text-center">
+          <h2 className="text-2xl font-bold text-white mb-2">Acesso Necessário</h2>
+          <p className="text-slate-400 mb-6">Faça login para acessar o dashboard v2.0</p>
+          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+            Entrar
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
