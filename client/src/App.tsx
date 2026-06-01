@@ -20,12 +20,6 @@ import V2Reports from "./pages/V2Reports";
 import AdminDashboard from "./pages/AdminDashboard";
 import { CostOptimizationDashboard } from "./pages/CostOptimizationDashboard";
 import { IncidentResponseDashboard } from "./pages/IncidentResponseDashboard";
-// V3 - Consolidated versions
-const V3Dashboard = V2Dashboard;
-const V3Copilot = V2Copilot;
-const V3Diagnostics = V2Diagnostics;
-const V3Documents = V2Documents;
-const V3Reports = V2Reports;
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -47,12 +41,6 @@ function Router() {
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/operations/costs" component={CostOptimizationDashboard} />
       <Route path="/operations/incidents" component={IncidentResponseDashboard} />
-      {/* V3 - Consolidated Final Version */}
-      <Route path="/v3" component={V3Dashboard} />
-      <Route path="/v3/copilot" component={V3Copilot} />
-      <Route path="/v3/diagnostics" component={V3Diagnostics} />
-      <Route path="/v3/documents" component={V3Documents} />
-      <Route path="/v3/reports" component={V3Reports} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
